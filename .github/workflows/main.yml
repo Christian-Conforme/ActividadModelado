@@ -40,6 +40,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+      - name: Enable script execution
+        run: |
+          Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 
       - name: Set up Python
         uses: actions/setup-python@v2
