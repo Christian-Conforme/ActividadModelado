@@ -2,35 +2,27 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "Bienvenido a la Calculadora API. Usa las rutas /sumar, /restar, /multiplicar o /dividir para realizar operaciones."
-
-@app.route('/sumar', methods=['POST'])
-def sumar():
+@app.route('/calcular', methods=['POST'])
+def calcular():
     data = request.json
-    resultado = data['a'] + data['b']
-    return jsonify({'resultado': resultado})
+    operacion = data.get('operacion')
+    num1 = data.get('num1')
+    num2 = data.get('num2')
 
-@app.route('/restar', methods=['POST'])
-def restar():
-    data = request.json
-    resultado = data['a'] - data['b']
-    return jsonify({'resultado': resultado})
+    if operacion == 'sumar':
+        resultado = num1 + num2
+    elif operacion == 'restar':
+        resultado = num1 - num2
+    elif operacion == 'multiplicar':
+        resultado = num1 * num2
+    elif operacion == 'dividir':
+        if num2 == 0:
+            return jsonify({"error": "No se puede dividir entre cero."}), 400
+        resultado = num1 / num2
+    else:
+        return jsonify({"error": "Operación no válida."}), 400
 
-@app.route('/multiplicar', methods=['POST'])
-def multiplicar():
-    data = request.json
-    resultado = data['a'] * data['b']
-    return jsonify({'resultado': resultado})
+    return jsonify({"resultado": resultado})
 
-@app.route('/dividir', methods=['POST'])
-def dividir():
-    data = request.json
-    if data['b'] == 0:
-        return jsonify({'error': 'No se puede dividir entre cero.'}), 400
-    resultado = data['a'] / data['b']
-    return jsonify({'resultado': resultado})
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)

@@ -34,19 +34,13 @@ jobs:
       - name: Run Tests
         run: |
           pytest
-
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Cambia a ubuntu-latest si usas Linux
+    needs: test  # Asegúrate de que las pruebas pasen antes de desplegar
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Deploy to Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      - name: Deploy to Local Server
         run: |
-          heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
-          git push heroku main
+          .\deploy.bat  # O ./deploy.sh si usas un script Bash
