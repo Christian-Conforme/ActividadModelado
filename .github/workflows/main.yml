@@ -35,12 +35,22 @@ jobs:
         run: |
           pytest
   deploy:
-    runs-on: windows-latest  # Cambia a ubuntu-latest si usas Linux
-    needs: test  # Asegúrate de que las pruebas pasen antes de desplegar
+    runs-on: windows-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Deploy to Local Server
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
         run: |
-          .\deploy.bat  # O ./deploy.sh si usas un script Bash
+          python -m pip install --upgrade pip
+          pip install Flask
+
+      - name: Run Deploy Script
+        run: |
+          deploy.bat
