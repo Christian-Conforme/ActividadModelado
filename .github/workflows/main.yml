@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI Pipeline for Windows
 
 on:
   push:
@@ -7,22 +7,37 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+
     steps:
+      # Paso 1: Checkout del código
       - name: Checkout Code
         uses: actions/checkout@v2
 
+      # Paso 2: Configurar Docker en Windows
+      - name: Set up Docker for Windows
+        run: |
+          Start-Service Docker
+
+      # Paso 3: Construir la imagen Docker
       - name: Build Docker Image
         run: |
           docker build -t calculadora .
 
+      # Paso 4: Ejecutar la calculadora en Docker con un ejemplo (ejemplo de suma: 10 + 5)
+      - name: Run Calculator in Docker
+        run: |
+          docker run --rm calculadora 1 10 5
+
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    needs: build
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      
-      - name: Set up Python
+
+      - name: Set up Python for Windows
         uses: actions/setup-python@v2
         with:
           python-version: '3.8'
@@ -37,16 +52,20 @@ jobs:
           pytest
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: test
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Build Docker Image
+      # Despliegue manual o vía SSH (si aplicable en tu caso)
+      - name: SSH into local machine (Windows)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          docker build -t calculadora .
-
-      - name: Run Docker Container
-        run: |
-          docker run --rm calculadora
+          mkdir -p C:/Users/Chris/.ssh
+          echo "$SSH_PRIVATE_KEY" > C:/Users/Chris/.ssh/id_rsa
+          chmod 600 C:/Users/Chris/.ssh/id_rsa
+          ssh-keyscan -H localhost >> C:/Users/Chris/.ssh/known_hosts
+          ssh chris@localhost 'cd C:/Users/Chris/ActividadModelado && git push origin main && python calculadora.py'

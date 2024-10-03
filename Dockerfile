@@ -1,14 +1,6 @@
-# Dockerfile
 FROM python:3.8-slim
-
-# Set the working directory
+COPY . /app
 WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . .
-
-# Install any needed packages specified in requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Run calculadora.py when the container launches
+RUN pip install -r requirements.txt
 CMD ["python", "calculadora.py"]
+ENTRYPOINT ["python", "calculadora.py"]
