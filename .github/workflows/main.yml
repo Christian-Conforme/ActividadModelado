@@ -34,4 +34,24 @@ jobs:
       - name: Run Tests
         run: |
           pytest
-  
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test  # Esto asegura que las pruebas pasen antes de construir el Docker
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      # Paso 1: Instalar Docker en el entorno de CI
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Paso 2: Construir la imagen Docker
+      - name: Build Docker image
+        run: |
+          docker build -t calculadora .
+
+      # Paso 3: Ejecutar la imagen Docker con un ejemplo de operación
+      - name: Run Docker container
+        run: |
+          docker run --rm calculadora 1 10 5
